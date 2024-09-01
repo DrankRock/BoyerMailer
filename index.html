@@ -150,7 +150,7 @@
                 'alumniInfo': 'I heard you also want to make an alumni process, you can contact me by mail at {email}. Links related to me are : {links}.',
                 'thanks': 'Thank you for everything this year,',
                 'closing': 'Best regards,',
-                'ps': 'PS: this mail was auto-generated using <url>',
+                'ps': 'PS: this mail was auto-generated.',
                 'emailSubject': '[M2GI] Class Feedback'
             },
             'fr': {
@@ -159,8 +159,8 @@
                 'classFeedback': 'J\'ai suivi le cours {className} et j\'ai pensé:',
                 'alumniInfo': 'J\'ai entendu dire que vous souhaitez également initier un processus d\'anciens élèves, vous pouvez me contacter par mail à, {email}. Des liens associés à moi sont:  {links}',
                 'thanks': 'Merci pour tout cette année,',
-                'closing': 'Cordialement',
-                'ps': 'PS : ce mail a été généré automatiquement en utilisant <url>',
+                'closing': 'Cordialement,',
+                'ps': 'PS : ce mail a été généré automatiquement.',
                 'emailSubject': '[M2GI] Feedback des cours'
             }
         };
@@ -248,29 +248,36 @@
         }
 
         function generateRecap() {
-            const lang = document.getElementById('language').value;
-            const templates = recapTextTemplates[lang];
-            const selectedClasses = document.querySelectorAll('input[name="classes"]:checked');
-            let recapText = `${templates.greeting}\n\n${templates.intro}\n\n`;
+        const lang = document.getElementById('language').value;
+        const templates = recapTextTemplates[lang];
+        const selectedClasses = document.querySelectorAll('input[name="classes"]:checked');
+        let recapText = `${templates.greeting}\n\n${templates.intro}\n\n`;
 
-            selectedClasses.forEach((classCheckbox, index) => {
-                const className = classCheckbox.value;
-                const textarea = document.querySelector(`textarea[data-class-index="${index}"]`);
-                recapText += `${templates.classFeedback.replace('{className}', className)}\n${textarea.value}\n\n`;
-            });
+        selectedClasses.forEach((classCheckbox, index) => {
+            const className = classCheckbox.value;
+            const textarea = document.querySelector(`textarea[data-class-index="${index}"]`);
+            const feedback = textarea.value.trim();
 
-            if (document.getElementById('share-info').checked) {
-                const fullName = document.getElementById('full-name').value;
-                const email = document.getElementById('email').value;
-                const speciality = document.getElementById('speciality').value;
-                const links = document.getElementById('links').value;
-                recapText += `${templates.alumniInfo.replace('{links}', links).replace('{email}', email)}\n\n${templates.thanks}\n\n${templates.closing},\n${fullName}\n\n`;
+            if (feedback) {  // Only add to recapText if there is feedback
+                recapText += `${templates.classFeedback.replace('{className}', className)}\n${feedback}\n\n`;
             }
+        });
 
-            recapText += `${templates.ps}`;
-            document.getElementById('recap-text').innerText = recapText;
-            document.getElementById('recap-section').classList.remove('hidden');
+        if (document.getElementById('share-info').checked) {
+            const fullName = document.getElementById('full-name').value;
+            const email = document.getElementById('email').value;
+            const speciality = document.getElementById('speciality').value;
+            const links = document.getElementById('links').value;
+            recapText += `${templates.alumniInfo.replace('{links}', links).replace('{email}', email)}`;
         }
+
+        recapText += `\n${templates.thanks}\n\n${templates.closing}\n\n`;
+
+        recapText += `\n\n${templates.ps}`;
+        document.getElementById('recap-text').innerText = recapText;
+        document.getElementById('recap-section').classList.remove('hidden');
+    }
+
 
 
         function saveFeedbackToCookies() {
