@@ -75,6 +75,8 @@
         <button onclick="copyRecapToClipboard()">Copy to Clipboard</button>
     </div>
 
+    <button onclick="sendMail()">Send Email</button>
+
     <script>
         const classNames = {
             'en': [
@@ -328,6 +330,21 @@
             document.getElementById('language').value = lang;
             updateLanguage(lang);
         });
+
+        function sendMail() {
+            const lang = document.getElementById('language').value;
+            const templates = recapTextTemplates[lang];
+            const recapText = document.getElementById('recap-text').innerText;
+
+            const subject = templates.emailSubject;
+            const body = encodeURIComponent(recapText);  // Encode the body text to ensure it works properly in a mailto link
+
+            // Construct the mailto link
+            const mailtoLink = `mailto:fabienne.boyer@univ-grenoble-alpes.fr?subject=${encodeURIComponent(subject)}&body=${body}`;
+
+            // Open the default mail client
+            window.location.href = mailtoLink;
+        }
 
     </script>
 </body>
