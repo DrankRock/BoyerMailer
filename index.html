@@ -3,26 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="styles.css">
-    <title>Class Feedback Form</title>
+    <title>Boyer Auto Recap</title>
 </head>
 <body>
-    <h1 id="title">Class Feedback Form</h1>
+    <h1 id="title">Boyer Auto Recap</h1>
+
+    <!-- Night Mode Toggle Button -->
+    <div class="section">
+        <button onclick="toggleNightMode()">Toggle Night Mode</button>
+    </div>
     
     <!-- Language Selection -->
     <div class="section">
-        <label for="language">Select Language:</label>
-        <select id="language" onchange="changeLanguage()">
-            <option value="en">English</option>
-            <option value="fr">Français</option>
-        </select>
+        <div class="form-group">
+            <label for="language">Select Language:</label>
+            <select id="language" onchange="changeLanguage()">
+                <option value="en">English</option>
+                <option value="fr">Français</option>
+            </select>
+        </div>
     </div>
 
     <!-- Class Selection -->
     <div class="section">
         <h2 id="class-selection-title">Select Classes</h2>
-        <label><input type="checkbox" name="classes" value="Math101" onclick="toggleQuestions()"> Math 101</label><br>
-        <label><input type="checkbox" name="classes" value="CS102" onclick="toggleQuestions()"> Computer Science 102</label><br>
-        <label><input type="checkbox" name="classes" value="Hist103" onclick="toggleQuestions()"> History 103</label>
+        <div id="class-checkboxes" class="form-group">
+            <!-- Checkboxes will be dynamically inserted here -->
+        </div>
     </div>
 
     <!-- Questions Section -->
@@ -32,17 +39,32 @@
 
     <!-- Alumni Information -->
     <div class="section">
-        <label><input type="checkbox" id="share-info" onclick="toggleAlumniInfo()"> Share my info for an alumni process</label>
+        <div class="form-group">
+            <label for="share-info">Share my info for an alumni process</label>
+            <input type="checkbox" id="share-info" onclick="toggleAlumniInfo()">
+        </div>
         <div id="alumni-info" class="hidden">
-            <label>Full Name: <input type="text" id="full-name"></label><br>
-            <label>Email: <input type="email" id="email"></label><br>
-            <label>Speciality: <input type="text" id="speciality"></label><br>
-            <label>LinkedIn: <input type="url" id="linkedin"></label>
+            <div class="form-group">
+                <label for="full-name">Full Name:</label>
+                <input type="text" id="full-name">
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email">
+            </div>
+            <div class="form-group">
+                <label for="speciality">Speciality:</label>
+                <input type="text" id="speciality">
+            </div>
+            <div class="form-group">
+                <label for="links">Links:</label>
+                <input type="url" id="links">
+            </div>
         </div>
     </div>
 
-     <!-- Generate Recap Button -->
-     <div class="section">
+    <!-- Generate Recap Button -->
+    <div class="section">
         <button onclick="generateRecap()">Generate Recap</button>
     </div>
 
@@ -55,8 +77,42 @@
 
     <script>
         const classNames = {
-            'en': ['Math 101', 'Computer Science 102', 'History 103'],
-            'fr': ['Mathématiques 101', 'Informatique 102', 'Histoire 103']
+            'en': [
+                'Internship', 
+                'English', 
+                'S1 - E-Commerce (ECOM Project) ',
+                'S1 - Big Data ',
+                'S1 - HMI (Human-Machine Interface) ',
+                'S1 - Model-Driven Engineering (IDM) ',
+                'S1 - Software Engineering (CPL) ',
+                'S1 - Machine Learning ',
+                'S1 - Distributed Application Systems (SAR) ',
+                'S2 - Mobile Development',
+                'S2 - Doc - Multimedia',
+                'S2 - Internet of Things (IOT/IOC)',
+                'S2 - Pervasive Systems',
+                'S2 - Advanced Testing Techniques (TAT/TAV)',
+                'S2 - DevOps Week',
+                'S2 - Marketing Week'
+            ],
+            'fr': [
+                'Alternance', 
+                'Anglais', 
+                'S1 - E-Commerce (Projet ECOM) ',
+                'S1 - Big Data ',
+                'S1 - IHM ',
+                'S1 - Ingenieurie Dirigée par les Modèles (IDM) ',
+                'S1 - Génie Logiciel (CPL) ',
+                'S1 - Machine Learning ',
+                'S1 - Systèmes d\'Applications Répartis (SAR) ',
+                'S2 - Developement Mobile',
+                'S2 - Doc - Multimedia',
+                'S2 - L\'internet des choses (IOT/IOC)',
+                'S2 - Systèmes Pervasifs',
+                'S2 - Techniques Avancés de Test (TAT/TAV)',
+                'S2 - Semaine de DevOps',
+                'S2 - Semaine de Marketing'
+            ]
         };
     
         const labels = {
@@ -68,31 +124,55 @@
                 'fullName': 'Full Name',
                 'email': 'Email',
                 'speciality': 'Speciality',
-                'linkedin': 'LinkedIn',
+                'links': 'Links',
                 'generateRecap': 'Generate Recap'
             },
             'fr': {
                 'title': 'Formulaire de Feedback de Cours',
                 'classSelectionTitle': 'Sélectionnez les Cours',
-                'questionPrefix': 'Que pensez-vous de ',
+                'questionPrefix': 'Qu\'avez vous pensé de ',
                 'shareInfo': 'Partager mes informations pour un processus d\'anciens élèves',
                 'fullName': 'Nom Complet',
                 'email': 'Email',
                 'speciality': 'Spécialité',
-                'linkedin': 'LinkedIn',
+                'links': 'Liens',
                 'generateRecap': 'Générer le Récapitulatif'
             }
         };
-    
+
+        const recapTextTemplates = {
+            'en': {
+                'greeting': 'Dear Mrs Boyer,',
+                'intro': 'Here is a recap of what I thought about the different classes I had:',
+                'classFeedback': 'I took class {className} and thought:',
+                'alumniInfo': 'I heard you also want to make an alumni process, you can contact me by mail at {email}. Links related to me are : {links}.',
+                'thanks': 'Thank you for everything this year,',
+                'closing': 'Best regards,',
+                'ps': 'PS: this mail was auto-generated using <url>',
+                'emailSubject': '[M2GI] Class Feedback'
+            },
+            'fr': {
+                'greeting': 'Chère Mme Boyer,',
+                'intro': 'Voici un récapitulatif de ce que j\'ai pensé des différents cours que j\'ai suivis:',
+                'classFeedback': 'J\'ai suivi le cours {className} et j\'ai pensé:',
+                'alumniInfo': 'J\'ai entendu dire que vous souhaitez également initier un processus d\'anciens élèves, vous pouvez me contacter par mail à, {email}. Des liens associés à moi sont:  {links}',
+                'thanks': 'Merci pour tout cette année,',
+                'closing': 'Cordialement',
+                'ps': 'PS : ce mail a été généré automatiquement en utilisant <url>',
+                'emailSubject': '[M2GI] Feedback des cours'
+            }
+        };
+
+
         // Object to store textarea content
         const feedbackContent = {};
-    
+
         function changeLanguage() {
             const lang = document.getElementById('language').value;
             document.cookie = `language=${lang}; path=/;`;
             updateLanguage(lang);
         }
-    
+
         function updateLanguage(lang) {
             document.getElementById('title').innerText = labels[lang]['title'];
             document.getElementById('class-selection-title').innerText = labels[lang]['classSelectionTitle'];
@@ -101,47 +181,61 @@
             document.querySelector('label[for="full-name"]').innerText = labels[lang]['fullName'] + ':';
             document.querySelector('label[for="email"]').innerText = labels[lang]['email'] + ':';
             document.querySelector('label[for="speciality"]').innerText = labels[lang]['speciality'] + ':';
-            document.querySelector('label[for="linkedin"]').innerText = labels[lang]['linkedin'] + ':';
+            document.querySelector('label[for="links"]').innerText = labels[lang]['links'] + ':';
             document.querySelector('button[onclick="generateRecap()"]').innerText = labels[lang]['generateRecap'];
-    
-            // Update class names
-            const checkboxes = document.querySelectorAll('input[name="classes"]');
-            checkboxes.forEach((checkbox, index) => {
-                checkbox.nextSibling.nodeValue = ' ' + classNames[lang][index];
+
+            // Update class names dynamically
+            const classContainer = document.getElementById('class-checkboxes');
+            classContainer.innerHTML = ''; // Clear existing checkboxes
+
+            classNames[lang].forEach((className, index) => {
+                const checkboxLabel = document.createElement('label');
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.name = 'classes';
+                checkbox.value = className;
+                checkbox.onclick = toggleQuestions;
+
+                checkboxLabel.appendChild(checkbox);
+                checkboxLabel.appendChild(document.createTextNode(' ' + className));
+                classContainer.appendChild(checkboxLabel);
+
+                // Line break for better layout
+                classContainer.appendChild(document.createElement('br'));
             });
         }
-    
+
         function toggleQuestions() {
             const selectedClasses = document.querySelectorAll('input[name="classes"]:checked');
             const questionsSection = document.getElementById('questions-section');
             questionsSection.innerHTML = ''; // Clear previous questions
-    
+
             selectedClasses.forEach((classCheckbox, index) => {
-                const className = classCheckbox.nextSibling.nodeValue.trim();
+                const className = classCheckbox.value;
                 const questionLabel = document.createElement('label');
                 questionLabel.innerText = `${labels[document.getElementById('language').value]['questionPrefix']}${className}:`;
-    
+
                 const textarea = document.createElement('textarea');
                 textarea.className = 'rich-text';
                 textarea.setAttribute('data-class-index', index); // Add a data attribute to link textarea to checkbox
-    
+
                 // Restore content if available
                 const savedContent = feedbackContent[classCheckbox.value] || getCookieContent(classCheckbox.value);
                 if (savedContent) {
                     textarea.value = savedContent;
                 }
-    
+
                 // Add an event listener to save content on change
                 textarea.addEventListener('input', () => {
                     feedbackContent[classCheckbox.value] = textarea.value;
                     saveFeedbackToCookies();
                 });
-    
+
                 questionsSection.appendChild(questionLabel);
                 questionsSection.appendChild(textarea);
             });
         }
-    
+
         function toggleAlumniInfo() {
             const alumniInfoSection = document.getElementById('alumni-info');
             if (document.getElementById('share-info').checked) {
@@ -150,64 +244,91 @@
                 alumniInfoSection.classList.add('hidden');
             }
         }
-    
+
         function generateRecap() {
             const lang = document.getElementById('language').value;
+            const templates = recapTextTemplates[lang];
             const selectedClasses = document.querySelectorAll('input[name="classes"]:checked');
-            let recapText = `Dear Mrs Boyer,\n\nHere is a recap of what I thought about the different classes I had:\n\n`;
-    
+            let recapText = `${templates.greeting}\n\n${templates.intro}\n\n`;
+
             selectedClasses.forEach((classCheckbox, index) => {
-                const className = classCheckbox.nextSibling.nodeValue.trim();
+                const className = classCheckbox.value;
                 const textarea = document.querySelector(`textarea[data-class-index="${index}"]`);
-                recapText += `I took class ${className} and thought:\n${textarea.value}\n\n`;
+                recapText += `${templates.classFeedback.replace('{className}', className)}\n${textarea.value}\n\n`;
             });
-    
+
             if (document.getElementById('share-info').checked) {
                 const fullName = document.getElementById('full-name').value;
                 const email = document.getElementById('email').value;
                 const speciality = document.getElementById('speciality').value;
-                const linkedin = document.getElementById('linkedin').value;
-                recapText += `I heard you also want to make an alumni process, you can contact me on ${linkedin}, ${email}.\n\nThank you for everything this year,\n\nBest regards,\n${fullName}\n\n`;
+                const links = document.getElementById('links').value;
+                recapText += `${templates.alumniInfo.replace('{links}', links).replace('{email}', email)}\n\n${templates.thanks}\n\n${templates.closing},\n${fullName}\n\n`;
             }
-    
-            recapText += `PS: this mail was auto-generated using <url>`;
+
+            recapText += `${templates.ps}`;
             document.getElementById('recap-text').innerText = recapText;
             document.getElementById('recap-section').classList.remove('hidden');
         }
-    
+
+
         function saveFeedbackToCookies() {
             // Save each feedback to cookies
             Object.keys(feedbackContent).forEach(classValue => {
                 document.cookie = `${classValue}=${encodeURIComponent(feedbackContent[classValue])}; path=/;`;
             });
         }
-    
+
         function getCookieContent(classValue) {
             const cookies = document.cookie.split('; ').reduce((acc, cookie) => {
                 const [name, value] = cookie.split('=');
                 acc[name] = decodeURIComponent(value);
                 return acc;
             }, {});
-    
+
             return cookies[classValue] || '';
         }
 
         function copyRecapToClipboard() {
             const recapText = document.getElementById('recap-text').innerText;
+            const button = document.querySelector('button[onclick="copyRecapToClipboard()"]');
+            const originalText = button.innerText;
+
             navigator.clipboard.writeText(recapText).then(() => {
-                alert('Recap copied to clipboard!');
+                button.innerText = 'Copied! ✓';
+                // Change back to the original text after 5 seconds
+                setTimeout(() => {
+                    button.innerText = originalText;
+                }, 5000);
             }).catch(err => {
                 alert('Failed to copy text: ' + err);
             });
         }
-    
-        // Set initial language from cookies or default to English
-        const langCookie = document.cookie.split('; ').find(row => row.startsWith('language='));
-        const lang = langCookie ? langCookie.split('=')[1] : 'en';
-        document.getElementById('language').value = lang;
-        updateLanguage(lang);
-    
+
+
+        function toggleNightMode() {
+            document.body.classList.toggle('night-mode');
+            // Save user's preference to local storage
+            if (document.body.classList.contains('night-mode')) {
+                localStorage.setItem('theme', 'night');
+            } else {
+                localStorage.setItem('theme', 'day');
+            }
+        }
+
+        // Check for saved theme preference on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'night') {
+                document.body.classList.add('night-mode');
+            }
+
+            // Set initial language from cookies or default to English
+            const langCookie = document.cookie.split('; ').find(row => row.startsWith('language='));
+            const lang = langCookie ? langCookie.split('=')[1] : 'en';
+            document.getElementById('language').value = lang;
+            updateLanguage(lang);
+        });
+
     </script>
-    
 </body>
 </html>
